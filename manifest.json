@@ -1,0 +1,105 @@
+{
+	"_version": "1.14.0",
+	"sap.app": {
+		"id": "ns.produtosfornecedor_card",
+		"type": "card",
+		"title": "Produtos por fornecedor",
+		"subTitle": "Cartão integração do tipo de lista",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+        "deviceTypes": {"desktop": true, "phone": true, "tablet": true},
+		"icons": {
+			"icon": "sap-icon://list"
+		}
+	},
+	"sap.card": {
+		"type": "List",
+		"configuration": {
+			"destinations": {
+				"ES5": {
+					"name": "ES5",
+				   "defaultUrl": "/sap/opu/odata/sap/EPM_REF_APPS_SHOP_SRV/"
+				}
+			},
+			"parameters": {
+				"title" : {
+					"value": "Cartão produtos Top {{parameters.maxItems}}"
+				},
+				"subTitle": {
+					"value": "Esses são os mais vendidos este mês"
+				},
+				"maxItems": {
+					"value": 4
+				},
+				"selectedSupplierID": {
+					"value": 100000001,
+					"type": "integer",
+					"label": "Fornecedor selecionado"
+				}    
+			},
+			"filters": {
+				"supplier": {
+					"value": "{{parameters.selectedSupplierID}}",
+					"type": "string",
+					"label": "Fornecedor",
+					"description": "Filtrar as ordens por fornecedor",
+					   "item": {
+						   "path": "/d/results",
+						   "template": {
+							   "key": "{Id}",
+							   "title": "{Name}"
+						   }
+					   },
+					   "data": {
+							"request": {
+								"url": "{{destinations.ES5}}/sap/opu/odata/sap/EPM_REF_APPS_SHOP_SRV/Suppliers",
+								"withCredentials": true
+							}
+					   }
+				   }
+			   }
+		},
+		"data": {
+			"request": {
+				"url": "{{destinations.ES5}}/sap/opu/odata/sap/EPM_REF_APPS_SHOP_SRV/Products",
+				"parameters": {
+					"$filter": "Supplier/Id eq '{filters>/supplier/value}'"
+				},
+				"withCredentials": true
+			},
+			"path": "/d/results"
+		},
+        "designtime": "dt/configuration",
+		"header": {
+			"title": "Produtos providos pelo fornecedor {filters>/supplier/selectedItem/title}",
+			"subTitle": "{{parameters.subTitle}}",
+			"icon": {
+				"src": "sap-icon://desktop-mobile"
+			},
+			"status": {
+				"text": "{{parameters.maxItems}} of 20"
+			}
+		},
+		"content": {
+            "item": {
+                "title": "{Name}",
+                "description": "{Description}",
+                "icon": {
+                    "src": "{ImageUrl}"
+                },
+                "info": {
+                    "value": "{AverageRating}",
+                    "state": "{= ${AverageRating} > 3.5 ? 'Success' : 'Warning' }"
+                }
+            },
+            "maxItems": "{{parameters.maxItems}}"
+        }
+	},
+    "sap.platform.mobilecards": {
+        "compatible": false
+    }
+}
